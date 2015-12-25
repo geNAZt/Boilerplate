@@ -12,11 +12,18 @@
     <properties>
         <buildNumber>SNAPSHOT</buildNumber>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <github.global.server>github</github.global.server>
     </properties>
 
     <modules>
         <module>core</module>
     </modules>
+
+    <scm>
+        <url>https://github.com/geNAZt/Boilerplate</url>
+        <connection>scm:git:https://github.com/geNAZt/Boilerplate.git</connection>
+        <developerConnection>scm:git:https://github.com/geNAZt/Boilerplate.git</developerConnection>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -72,19 +79,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <show>public</show>
+                    <nohelp>true</nohelp>
+                    <header>Boilerplate, ${project.version}</header>
+                    <footer>Boilerplate, ${project.version}</footer>
+                    <doctitle>Boilerplate, ${project.version}</doctitle>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -93,6 +96,20 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>1.1</version>
+                <configuration>
+                    <serverId>github</serverId>
+                    <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
+                    <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
+                    <content>${project.reporting.outputDirectory}/apidocs</content>
+                    <skipDeletedFiles>true</skipDeletedFiles>
+                    <pubScmUrl>scm:git:https://github.com/geNAZt/Boilerplate.git</pubScmUrl>
+                    <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
+                </configuration>
             </plugin>
         </plugins>
     </build>
