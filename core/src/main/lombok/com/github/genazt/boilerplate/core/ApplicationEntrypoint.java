@@ -129,7 +129,9 @@ public class ApplicationEntrypoint {
 			while ( isRunning() ) {
 				String line = this.consoleReader.readLine( ConsoleColor.AQUA + "> " );
 				if ( line != null ) {
-					System.out.println( line );
+					if ( !this.commandRegistry.processCommand( line ) ) {
+						this.logger.info( "Invalid command: " + line );
+					}
 				}
 			}
 		} catch ( Exception ex ) {

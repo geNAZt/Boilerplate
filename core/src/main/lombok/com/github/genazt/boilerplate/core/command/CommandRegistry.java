@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author geNAZt
@@ -22,7 +23,7 @@ public class CommandRegistry {
 	// Logger for this Module
 	private final ModuleLogger moduleLogger;
 	// Map which holds all commands
-	private final Map<String, Command> commandMap = new HashMap<>();
+	private final Map<String, Command> commandMap = new ConcurrentHashMap<>();
 
 	/**
 	 * Register a new Command with a name and a instance of the Command itself
@@ -32,5 +33,41 @@ public class CommandRegistry {
 	 */
 	public void registerCommand( String name, Command command ) {
 		this.moduleLogger.info( "Wanting to register new command: " + name + " with instance " + command.toString() );
+
+		// Check if we already have a command with this name
+		if ( this.commandMap.containsKey( name ) ) {
+			this.moduleLogger.warning( "Already have a command with the name " + name + " registered" );
+			return;
+		}
+
+		// Register the command
+		this.commandMap.put( name, command );
+	}
+
+	/**
+	 * Process a incoming Command line. It gets splitted by all spaces and the first split is used as command name
+	 * the rest is used as arguments to get passed to the Command itself
+	 *
+	 * @param line which has been entered from the user
+	 * @return true if the command has been executed, false if not
+	 */
+	public boolean processCommand( String line ) {
+		// Split the arguments
+		String[] split = line.split( " " );
+		String commandName = split[0];
+
+		// Find the command
+		Command command = this.commandMap.get( commandName );
+		if ( command != null ) {
+			// Reapply the arguments
+			String[] arguments = new String[split.length - 1];
+			System.arraycopy( split, 1, arguments, 0, split.length - 1 );
+
+			// Run the command
+			return command.run( arguments );
+		}
+
+		// Command not found
+		return false;
 	}
 }
